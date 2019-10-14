@@ -1,4 +1,4 @@
-package com.sd.codec;
+package com.fan.codec;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.shaded.netty4.io.netty.buffer.ByteBuf;

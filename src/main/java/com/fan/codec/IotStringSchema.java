@@ -1,4 +1,4 @@
-package com.sd.codec;
+package com.fan.codec;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;

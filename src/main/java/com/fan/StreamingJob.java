@@ -16,13 +16,13 @@
  * limitations under the License.
  */
 
-package com.sd;
+package com.fan;
 
-import com.sd.codec.IotStringSchema;
-import com.sd.connector.CommonDefs;
-import com.sd.connector.PgsqlWriter;
-import com.sd.connector.RedisWriter;
-import com.sd.connector.SinkerOption;
+import com.fan.codec.IotStringSchema;
+import com.fan.connector.CommonDefs;
+import com.fan.connector.PgsqlWriter;
+import com.fan.connector.RedisWriter;
+import com.fan.connector.SinkerOption;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;

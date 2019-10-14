@@ -1,4 +1,4 @@
-package com.sd.codec;
+package com.fan.codec;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

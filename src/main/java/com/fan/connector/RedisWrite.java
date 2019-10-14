@@ -1,4 +1,4 @@
-package com.sd.connector;
+package com.fan.connector;
 
 import redis.clients.jedis.Jedis;
 

@@ -1,4 +1,4 @@
-package com.sd.connector;
+package com.fan.connector;
 
 import org.apache.flink.api.java.tuple.Tuple6;
 import org.apache.flink.configuration.Configuration;

@@ -1,6 +1,4 @@
-package com.sd.connector;
-
-import org.apache.flink.streaming.api.windowing.time.Time;
+package com.fan.connector;
 
 /**
  * Author: Will Fan
