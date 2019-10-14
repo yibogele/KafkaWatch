@@ -1,0 +1,27 @@
+// schema由基本类型（null,boolean, int, long, float, double, bytes 和string）和复杂类型（record, enum, array, map, union, 和fixed）组成。
+{
+  "namespace": "com.core.venusiot.common.dto",
+  "type": "record",
+  "name": "VenusMessage",
+  "fields": [
+    {"name": "deviceId", "type": ["null", "string"],"default": null},
+    {"name": "deviceType", "type": ["null", "string"],"default": null},
+    {"name": "apiKey", "type": ["null", "string"],"default": null},
+    {"name": "productKey", "type": ["null", "string"],"default": null},
+    {"name": "dateTime", "type": ["null", "string"],"default": null},
+    {"name": "curMapType", "type": ["null", "string"],"default": null},
+    {"name": "longitude", "type": ["null", "string"],"default": null},
+    {"name": "latitude", "type": ["null", "string"],"default": null},
+    {"name": "direction", "type": ["null", "string"],"default": null},
+    {"name": "mnc", "type": ["null", "string"],"default": null},
+    {"name": "lac", "type": ["null", "string"],"default": null},
+    {"name": "cellid", "type": ["null", "string"],"default": null},
+    {"name": "messageId", "type": ["null", "string"],"default": null},
+    {"name": "dataType", "type": ["null", "string"],"default": null},
+    {"name": "onLine", "type":["null", "string"] ,"default": null},
+    {"name": "alarm", "type":["null", "string"] ,"default": null},
+    {"name": "simNum", "type":["null", "string"] ,"default": null},
+    {"name": "version", "type":["null", "string"] ,"default": null},
+    {"name": "body", "type": ["null", "string"],"default": null}
+  ]
+}
