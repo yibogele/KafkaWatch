@@ -1,5 +1,6 @@
-package com.fan.codec;
+package com.sd.codec;
 
+import com.sd.model.InData;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumReader;
@@ -10,7 +11,6 @@ import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.serialization.SerializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.apache.flink.api.java.tuple.Tuple4;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -25,8 +25,8 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
  * Created: 2019/10/10 11:40
  * Description:
  */
-public class IotStringSchema implements DeserializationSchema<Tuple4<String, String, String, Long>>,
-        SerializationSchema<Tuple4<String, String, String, Long>> {
+public class IotStringSchema implements DeserializationSchema<InData>,
+        SerializationSchema<InData> {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -44,7 +44,7 @@ public class IotStringSchema implements DeserializationSchema<Tuple4<String, Str
     }
 
     @Override
-    public Tuple4<String, String, String, Long> deserialize(byte[] message) throws IOException {
+    public InData deserialize(byte[] message) throws IOException {
         Schema schema = new Schema.Parser().parse(getClass().getResourceAsStream("/venusmessage.avsc"));
 
         DatumReader<GenericRecord> reader = new SpecificDatumReader<>(schema);
@@ -54,13 +54,15 @@ public class IotStringSchema implements DeserializationSchema<Tuple4<String, Str
             // some iot device just dont have any fucking ts,
             // so we put in current ts, maybe several ms later than event time
             System.out.println(payload2);
+
             payload2.put("dateTime", System.currentTimeMillis());
         }
 
-        return new Tuple4<>(payload2.get("deviceId").toString(),
+        return new InData(payload2.get("deviceId").toString(),
                 payload2.get("productKey").toString(),
                 payload2.get("dataType").toString(),
-                Long.valueOf(payload2.get("dateTime").toString()));
+                Long.valueOf(payload2.get("dateTime").toString()),
+                (long) message.length);
 
     }
 
@@ -94,18 +96,18 @@ public class IotStringSchema implements DeserializationSchema<Tuple4<String, Str
         }
     */
     @Override
-    public boolean isEndOfStream(Tuple4<String, String, String, Long> nextElement) {
+    public boolean isEndOfStream(InData nextElement) {
         return false;
     }
 
     @Override
-    public byte[] serialize(Tuple4<String, String, String, Long> element) {
+    public byte[] serialize(InData element) {
         return element.toString().getBytes(charset);
     }
 
     @Override
-    public TypeInformation<Tuple4<String, String, String, Long>> getProducedType() {
-        return TypeInformation.of(new TypeHint<Tuple4<String, String, String, Long>>() {
+    public TypeInformation<InData> getProducedType() {
+        return TypeInformation.of(new TypeHint<InData>() {
         });
 
     }

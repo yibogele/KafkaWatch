@@ -1,4 +1,4 @@
-package com.fan.connector;
+package com.sd.connector;
 
 /**
  * Author: Will Fan
@@ -8,7 +8,8 @@ package com.fan.connector;
 public enum SinkerOption {
     Redis("redis", 1),
     PgSql("pgsql", 2),
-    Kafka("kafka", 4);
+    Kafka("kafka", 4),
+    Redis2("redis2", 8);
 
     private String name;
     private int value;

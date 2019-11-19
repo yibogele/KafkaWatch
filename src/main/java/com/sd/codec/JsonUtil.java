@@ -1,4 +1,4 @@
-package com.fan.codec;
+package com.sd.codec;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,6 +19,7 @@ import java.util.Map;
  * <p>
  * Author hanpengcheng
  */
+@SuppressWarnings("unchecked")
 public class JsonUtil {
 
     private final static ObjectMapper objectMapper = new ObjectMapper();

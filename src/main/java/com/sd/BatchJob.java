@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.fan;
+package com.sd;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
 
