@@ -1,6 +1,6 @@
-package com.sd.op;
+package com.fanwill.op;
 
-import com.sd.model.InData;
+import com.fanwill.model.InData;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 

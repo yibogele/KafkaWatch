@@ -1,6 +1,6 @@
-package com.sd.connector;
+package com.fanwill.connector;
 
-import com.sd.model.OutData;
+import com.fanwill.model.OutData;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.configuration.Configuration;

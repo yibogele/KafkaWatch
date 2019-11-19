@@ -1,4 +1,4 @@
-package com.sd.connector;
+package com.fanwill.connector;
 
 /**
  * Author: Will Fan

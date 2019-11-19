@@ -16,14 +16,15 @@
  * limitations under the License.
  */
 
-package com.sd;
+package com.fanwill;
 
-import com.sd.codec.IotStringSchema;
+import com.fanwill.codec.IotStringSchema;
+import com.fanwill.connector.*;
+import com.fanwill.model.OutData;
+import com.fanwill.op.DevCountAgg;
 import com.sd.connector.*;
-import com.sd.model.InData;
-import com.sd.model.OutData;
-import com.sd.op.DevCountAgg;
-import com.sd.op.ProductCounter;
+import com.fanwill.model.InData;
+import com.fanwill.op.ProductCounter;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -35,6 +36,7 @@ import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTime
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer08;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer08;
+import org.fanwill.connector.*;
 
 import java.util.*;
 

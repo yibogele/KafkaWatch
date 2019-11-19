@@ -1,6 +1,4 @@
-package com.sd.connector;
-
-import redis.clients.jedis.Jedis;
+package com.fanwill.connector;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,7 +6,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Author: Will Fan

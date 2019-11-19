@@ -1,7 +1,7 @@
-package com.sd.op;
+package com.fanwill.op;
 
-import com.sd.model.InData;
-import com.sd.model.OutData;
+import com.fanwill.model.InData;
+import com.fanwill.model.OutData;
 import org.apache.flink.api.common.functions.AggregateFunction;
 
 /**

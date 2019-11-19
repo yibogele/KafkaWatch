@@ -1,6 +1,6 @@
-package com.sd.codec;
+package com.fanwill.codec;
 
-import com.sd.model.InData;
+import com.fanwill.model.InData;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumReader;

@@ -1,4 +1,4 @@
-package com.sd.connector;
+package com.fanwill.connector;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.ParameterTool;

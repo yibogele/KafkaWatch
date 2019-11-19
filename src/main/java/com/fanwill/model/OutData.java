@@ -1,4 +1,4 @@
-package com.sd.model;
+package com.fanwill.model;
 
 
 import org.apache.flink.api.java.tuple.Tuple7;

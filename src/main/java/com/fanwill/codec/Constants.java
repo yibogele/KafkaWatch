@@ -1,4 +1,4 @@
-package com.sd.codec;
+package com.fanwill.codec;
 
 /**
  * Author: Will Fan

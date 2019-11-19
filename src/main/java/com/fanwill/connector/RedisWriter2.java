@@ -1,18 +1,21 @@
-package com.sd.connector;
+package com.fanwill.connector;
 
-import com.sd.model.OutData;
+import com.fanwill.model.OutData;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 import redis.clients.jedis.Jedis;
 
+import java.util.Calendar;
+
+
 /**
  * Author: Will Fan
- * Created: 2019/10/11 9:07
+ * Created: 2019/10/14 16:46
  * Description:
  */
-public class RedisWriter extends RichSinkFunction<OutData> {
-    //    private JedisPool jedisPool;
+public class RedisWriter2 extends RichSinkFunction<OutData> {
+
     private Jedis redisConn;
 
     @Override
@@ -37,15 +40,31 @@ public class RedisWriter extends RichSinkFunction<OutData> {
 
     @Override
     public void invoke(OutData value, Context context) {
-        String key = CommonDefs.REDIS_KEY_PREFIX + value.f1 + ":" + value.f0 + ":" + value.f2;
+        String key = CommonDefs.REDIS_KEY_PREFIX2 + value.f1 + ":" + value.f0;
         redisConn.hset(key, "devId", value.f0);
-        redisConn.hset(key, "productKey", value.f1);
-        redisConn.hset(key, "dataType", value.f2);
-        redisConn.hset(key, "startETime", value.f3.toString());
-        redisConn.hset(key, "processTime", value.f4.toString());
-        redisConn.hset(key, "count", value.f5.toString());
 
-        redisConn.expire(key, 10 * 60);
+        redisConn.hset(key, "processTime", value.f4.toString());
+
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(value.f4);
+        int hour = c.get(Calendar.HOUR);
+        int minute = c.get(Calendar.MINUTE);
+
+        if (hour == 0 && minute < 10) {
+            redisConn.hset(key, "count", value.f5.toString());
+        } else {
+
+            long count = 0;
+            try {
+                count = Long.parseLong(redisConn.hget(key, "count"));
+            } catch (NumberFormatException ignored) {
+            }
+
+            redisConn.hset(key, "count", String.valueOf(value.f5 + count));
+        }
+
+        redisConn.expire(key, 24*60*60);
     }
+
 
 }

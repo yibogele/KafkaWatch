@@ -1,6 +1,6 @@
-package com.sd.connector;
+package com.fanwill.connector;
 
-import com.sd.model.OutData;
+import com.fanwill.model.OutData;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 
