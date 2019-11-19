@@ -22,7 +22,6 @@ import com.fanwill.codec.IotStringSchema;
 import com.fanwill.connector.*;
 import com.fanwill.model.OutData;
 import com.fanwill.op.DevCountAgg;
-import com.sd.connector.*;
 import com.fanwill.model.InData;
 import com.fanwill.op.ProductCounter;
 import org.apache.flink.api.common.functions.MapFunction;
@@ -36,7 +35,6 @@ import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTime
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer08;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer08;
-import org.fanwill.connector.*;
 
 import java.util.*;
 

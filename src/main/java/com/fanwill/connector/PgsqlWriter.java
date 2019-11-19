@@ -10,10 +10,8 @@ import org.apache.flink.runtime.state.FunctionSnapshotContext;
 import org.apache.flink.streaming.api.checkpoint.CheckpointedFunction;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 
-import java.sql.Connection;
+import java.sql.*;
 import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.Timestamp;
 import java.util.*;
 
 /**
@@ -31,7 +29,7 @@ public class PgsqlWriter extends RichSinkFunction<OutData> implements Checkpoint
 
     private BasicDataSource connectionPool;
     private Connection connection;
-    private PreparedStatement statement;
+//    private PreparedStatement statement;
     private ParameterTool gConf;
 
     //
@@ -46,15 +44,12 @@ public class PgsqlWriter extends RichSinkFunction<OutData> implements Checkpoint
 
         initPool();
 
-//        connection = connectionPool.getConnection();
+        connection = connectionPool.getConnection();
 //        statement = connection.prepareStatement(UPSERT_STAT);
     }
 
     @Override
     public void close() throws Exception {
-        if (statement != null) {
-            statement.close();
-        }
         if (connectionPool != null) {
             connectionPool.close();
         }
@@ -64,25 +59,8 @@ public class PgsqlWriter extends RichSinkFunction<OutData> implements Checkpoint
 
     @Override
     public void invoke(OutData value, Context context) throws Exception {
-//        try {
-//            insert(value, context);
-//        } catch (java.sql.BatchUpdateException be) {
-//            statement = connectionPool.getConnection().prepareStatement(UPSERT_STAT);
-//            insert(value, context);
-//        }
-
         pendingUpserts.add(value);
     }
-//    private void insert(OutData value, Context context) throws Exception {
-//        statement.setString(1, value.f0);
-//        statement.setString(2, value.f1);
-//        statement.setString(3, value.f2);
-//        statement.setDate(4, new Date(value.f4));
-//        statement.setLong(5, value.f5);
-//        statement.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
-//        statement.addBatch();
-//        statement.executeBatch();
-//    }
 
     private void initPool() {
         connectionPool = new BasicDataSource();
@@ -94,7 +72,7 @@ public class PgsqlWriter extends RichSinkFunction<OutData> implements Checkpoint
         connectionPool.setInitialSize(1);
 
 //        System.out.println("/////////////////////////");
-        System.out.println(gConf.get("pgsql.host", CommonDefs.PGSQL_HOST));
+//        System.out.println(gConf.get("pgsql.host", CommonDefs.PGSQL_HOST));
     }
 
 
@@ -102,39 +80,63 @@ public class PgsqlWriter extends RichSinkFunction<OutData> implements Checkpoint
     public void notifyCheckpointComplete(long checkpointId) throws Exception {
         System.out.println("<<<notifyCheckpointComplete>>>");
 
+        if (pendingUpsertsPerCheckpoint.isEmpty())
+            return;
+
         Iterator<Map.Entry<Long, List<OutData>>> pendingCheckpointsIt =
                 pendingUpsertsPerCheckpoint.entrySet().iterator();
+//        Connection connection = connectionPool.getConnection();
+        boolean autoCommit = connection.getAutoCommit();
+        try {
+            connection.setAutoCommit(false);
+            PreparedStatement preparedStatement = connection.prepareStatement(UPSERT_STAT);
+            int batchLimit = 1000;
+            try {
+                while (pendingCheckpointsIt.hasNext()) {
+                    Map.Entry<Long, List<OutData>> entry = pendingCheckpointsIt.next();
+                    Long pastCheckpointId = entry.getKey();
 
+                    List<OutData> pendingOuts = entry.getValue();
 
-        while (pendingCheckpointsIt.hasNext()){
+                    if (pastCheckpointId <= checkpointId) {
+                        for (OutData outData : pendingOuts) {
+                            preparedStatement.setString(1, outData.f0);
+                            preparedStatement.setString(2, outData.f1);
+                            preparedStatement.setString(3, outData.f2);
 
-            // 'cause we set the interval of this function in hours,
-            // at this time, connection should have been invalid,
-            // so re-get the connect from pool
-            connection = connectionPool.getConnection();
-            statement = connection.prepareStatement(UPSERT_STAT);
+                            preparedStatement.setDate(4, new Date(outData.f4 + 8 * 60 * 60 * 1000));
+                            preparedStatement.setLong(5, outData.f5);
+                            preparedStatement.setTimestamp(6, new Timestamp(System.currentTimeMillis() + 8 * 60 * 60 * 1000));
+//                    System.out.println("["+outData.f4+"========="+System.currentTimeMillis()+"]");
+                            preparedStatement.addBatch();
 
-            Map.Entry<Long, List<OutData>> entry = pendingCheckpointsIt.next();
-            Long pastCheckpointId = entry.getKey();
+                            batchLimit--;
+                            if (batchLimit == 0) {
+                                System.out.println("//////////////////////////////executeBatch///////////////////////");
+                                preparedStatement.executeBatch();
+                                preparedStatement.clearBatch();
+                                batchLimit = 1000;
+                            }
+                        }
 
-            List<OutData> pendingOuts = entry.getValue();
+                        pendingCheckpointsIt.remove();
+                    }
 
-            if (pastCheckpointId <= checkpointId) {
-                for (OutData outData: pendingOuts) {
-                    statement.setString(1, outData.f0);
-                    statement.setString(2, outData.f1);
-                    statement.setString(3, outData.f2);
-                    statement.setDate(4, new Date(outData.f4));
-                    statement.setLong(5, outData.f5);
-                    statement.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
-                    statement.addBatch();
                 }
-
-                pendingCheckpointsIt.remove();
+            }catch (SQLException se){
+                System.out.println("Exception when insert into PostgresSql:" + se);
+            }finally {
+                preparedStatement.executeBatch();
+                connection.commit();
+                if (preparedStatement != null)
+                    preparedStatement.close();
             }
-//            System.out.println("===================");
-            statement.executeBatch();
+        } finally {
+            connection.setAutoCommit(autoCommit);
         }
+
+//        statement.close();
+//        connection.close();
     }
 
     @Override
