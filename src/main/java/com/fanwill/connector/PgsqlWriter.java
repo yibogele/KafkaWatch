@@ -10,8 +10,8 @@ import org.apache.flink.runtime.state.FunctionSnapshotContext;
 import org.apache.flink.streaming.api.checkpoint.CheckpointedFunction;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 
-import java.sql.*;
 import java.sql.Date;
+import java.sql.*;
 import java.util.*;
 
 /**
@@ -28,8 +28,8 @@ public class PgsqlWriter extends RichSinkFunction<OutData> implements Checkpoint
             ;
 
     private BasicDataSource connectionPool;
-    private Connection connection;
-//    private PreparedStatement statement;
+//    private Connection connection;
+    //    private PreparedStatement statement;
     private ParameterTool gConf;
 
     //
@@ -44,7 +44,7 @@ public class PgsqlWriter extends RichSinkFunction<OutData> implements Checkpoint
 
         initPool();
 
-        connection = connectionPool.getConnection();
+//        connection = connectionPool.getConnection();
 //        statement = connection.prepareStatement(UPSERT_STAT);
     }
 
@@ -69,7 +69,7 @@ public class PgsqlWriter extends RichSinkFunction<OutData> implements Checkpoint
         connectionPool.setUsername(gConf.get("pgsql.user", CommonDefs.PGSQL_USER));
         connectionPool.setPassword(gConf.get("pgsql.pwd", CommonDefs.PGSQL_PWD));
 //        connectionPool.setPoolPreparedStatements(true);
-        connectionPool.setInitialSize(1);
+        connectionPool.setInitialSize(5);
 
 //        System.out.println("/////////////////////////");
 //        System.out.println(gConf.get("pgsql.host", CommonDefs.PGSQL_HOST));
@@ -85,7 +85,7 @@ public class PgsqlWriter extends RichSinkFunction<OutData> implements Checkpoint
 
         Iterator<Map.Entry<Long, List<OutData>>> pendingCheckpointsIt =
                 pendingUpsertsPerCheckpoint.entrySet().iterator();
-//        Connection connection = connectionPool.getConnection();
+        Connection connection = connectionPool.getConnection();
         boolean autoCommit = connection.getAutoCommit();
         try {
             connection.setAutoCommit(false);
@@ -123,9 +123,9 @@ public class PgsqlWriter extends RichSinkFunction<OutData> implements Checkpoint
                     }
 
                 }
-            }catch (SQLException se){
+            } catch (SQLException se) {
                 System.out.println("Exception when insert into PostgresSql:" + se);
-            }finally {
+            } finally {
                 preparedStatement.executeBatch();
                 connection.commit();
                 if (preparedStatement != null)
@@ -133,6 +133,7 @@ public class PgsqlWriter extends RichSinkFunction<OutData> implements Checkpoint
             }
         } finally {
             connection.setAutoCommit(autoCommit);
+            connection.close();
         }
 
 //        statement.close();
@@ -148,7 +149,7 @@ public class PgsqlWriter extends RichSinkFunction<OutData> implements Checkpoint
         List<OutData> outs = pendingUpsertsPerCheckpoint.computeIfAbsent(checkpointId, k -> new ArrayList<>());
 
         outs.addAll(pendingUpserts);
-        System.out.println("snapshotState: "+ pendingUpserts);
+        System.out.println("snapshotState: " + pendingUpserts);
         pendingUpserts.clear();
     }
 

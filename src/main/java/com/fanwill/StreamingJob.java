@@ -20,9 +20,9 @@ package com.fanwill;
 
 import com.fanwill.codec.IotStringSchema;
 import com.fanwill.connector.*;
+import com.fanwill.model.InData;
 import com.fanwill.model.OutData;
 import com.fanwill.op.DevCountAgg;
-import com.fanwill.model.InData;
 import com.fanwill.op.ProductCounter;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
@@ -38,7 +38,11 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer08;
 
 import java.util.*;
 
-
+/**
+ * Author: Will Fan
+ * Created: 2019/10/11 9:00
+ * Description:
+ */
 public class StreamingJob {
 
 
@@ -86,7 +90,8 @@ public class StreamingJob {
         set.add(SinkerOption.PgSql);
 //        processDS(dataStream, Time.days(1), Time.hours(16) , set, false);
 //        processDS(dataStream, Time.hours(8), Time.hours(0), set, false);
-        processDS(dataStream, Time.minutes(10), Time.minutes(0), set, true);
+        processDS(dataStream, Time.hours(12), Time.hours(4), set, false);
+//        processDS(dataStream, Time.minutes(10), Time.minutes(0), set, false);
 
         processWarn(dataStream, Time.seconds(parameters.getInt("iot.product.off.length")), false);
 
