@@ -125,11 +125,11 @@ public class StreamingJob {
 
         // redis
         if (sinkerOptions.contains(SinkerOption.Redis))
-            countStream.addSink(new RedisWriter());
+            countStream.addSink(new RedisWriter()).name("Redis");
 
         // pgsql
         if (sinkerOptions.contains(SinkerOption.PgSql))
-            countStream.addSink(new PgsqlWriter());
+            countStream.addSink(new PgsqlWriter()).name("Pgsql");
 
         // kafka
         if (sinkerOptions.contains(SinkerOption.Kafka)) {
@@ -143,7 +143,7 @@ public class StreamingJob {
 
         // redis2
         if (sinkerOptions.contains(SinkerOption.Redis2))
-            countStream.addSink(new RedisWriter2());
+            countStream.addSink(new RedisWriter2()).name("redis2");
     }
 
     private static void processWarn(
@@ -159,7 +159,7 @@ public class StreamingJob {
         if (debugToConsole)
             dataStream.print("产品:");
 
-        dataStream.addSink(new RedisWarnWriter());
+        dataStream.addSink(new RedisWarnWriter()).name("redis warn");
     }
 
 
