@@ -57,6 +57,8 @@ public class StreamingJob {
                 StreamingJob.class.getResourceAsStream("/my.properties"));
         env.getConfig().setGlobalJobParameters(parameters);
 
+        int parallelism = parameters.getInt("op.parallelism", 2);
+
 
         Properties properties = new Properties();
         properties.setProperty("bootstrap.servers",
@@ -77,29 +79,35 @@ public class StreamingJob {
         // messageType,
         // messageTime
         DataStream<InData> dataStream =
-                env.addSource(new FlinkKafkaConsumer08<>(topics, new IotStringSchema(), properties));
+                env.addSource(new FlinkKafkaConsumer08<>(topics, new IotStringSchema(), properties))
+//                .setParallelism(parallelism)
+                ;
 
 
         Set<SinkerOption> set = new HashSet<>();
         set.add(SinkerOption.Redis);
         set.add(SinkerOption.Redis2);
-        processDS(dataStream, Time.minutes(10), Time.minutes(0), set, false);
+        processDS(dataStream,parallelism,
+                Time.minutes(10), Time.minutes(0), set, false);
 
 
         set.clear();
         set.add(SinkerOption.PgSql);
 //        processDS(dataStream, Time.days(1), Time.hours(16) , set, false);
 //        processDS(dataStream, Time.hours(8), Time.hours(0), set, false);
-        processDS(dataStream, Time.hours(12), Time.hours(4), set, false);
+        processDS(dataStream, parallelism,
+                Time.hours(12), Time.hours(4), set, false);
 //        processDS(dataStream, Time.minutes(10), Time.minutes(0), set, false);
 
-        processWarn(dataStream, Time.seconds(parameters.getInt("iot.product.off.length")), false);
+        processWarn(dataStream, parallelism,
+                Time.seconds(parameters.getInt("iot.product.off.length")), false);
 
         // execute program
         env.execute("IotStat-hi");
     }
 
     private static void processDS(DataStream<InData> ds,
+                                  int p,
                                   Time size, Time offset,
                                   Set<SinkerOption> sinkerOptions,
                                   boolean debugToConsole) {
@@ -109,7 +117,7 @@ public class StreamingJob {
         DataStream<OutData> countStream = ds
                 .keyBy(0, 2)
                 .window(TumblingProcessingTimeWindows.of(size, offset))
-                .aggregate(new DevCountAgg());
+                .aggregate(new DevCountAgg()).setParallelism(p);
 
         // print
         if (debugToConsole)
@@ -139,14 +147,14 @@ public class StreamingJob {
     }
 
     private static void processWarn(
-            DataStream<InData> ds,
+            DataStream<InData> ds,int p,
             Time size,
             boolean debugToConsole
     ) {
         DataStream<Tuple2<String, Long>> dataStream = ds
                 .keyBy(1)
                 .window(TumblingProcessingTimeWindows.of(size))
-                .aggregate(new ProductCounter());
+                .aggregate(new ProductCounter()).setParallelism(p);
 
         if (debugToConsole)
             dataStream.print("产品:");

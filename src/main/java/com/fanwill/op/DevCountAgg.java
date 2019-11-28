@@ -46,6 +46,18 @@ public class DevCountAgg implements AggregateFunction<InData, MyCounter,
 
     @Override
     public MyCounter merge(MyCounter a, MyCounter b) {
-        return null;
+//        MyCounter mc = new MyCounter();
+//        mc.deviceId = a.deviceId;
+//        mc.productKey = a.productKey;
+//        mc.dataType = a.dataType;
+//        mc.sTime = a.sTime;
+//        mc.pTime = System.currentTimeMillis();
+//        mc.count = a.count + b.count;
+//        mc.traffic = a.traffic + b.traffic;
+//        return mc;
+          a.count += b.count;
+          a.traffic += b.traffic;
+          a.pTime = System.currentTimeMillis();
+          return a;
     }
 }
